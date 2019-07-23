@@ -2,7 +2,8 @@ export default class BIG {
     constructor(featureSize, systemOptimal, userInput) {
 
         // starting point of system optimal
-        this.systemOptimal = systemOptimal;
+        this.defaultSystemOptimal = systemOptimal;
+        this.systemOptimal = this.defaultSystemOptimal;
         console.log(this.systemOptimal)
 
         // define the space
@@ -34,12 +35,6 @@ export default class BIG {
 
         // starting point of user
         this.user_position = [0, 0];
-
-
-    }
-
-    reset() {
-        console.log('reset big');
     }
 
     // turn 1d array into 2d
@@ -346,7 +341,46 @@ export default class BIG {
 
         return enteredClients[distances.indexOf(Math.max(...distances))]
     }
+
+    reset() {
+        console.log("BIG RESET");
+
+        // starting point of system optimal
+        this.systemOptimal = this.defaultSystemOptimal; // systemOptimal;
+        console.log(this.systemOptimal);
+
+        // define the space
+        this.space = [];
+
+        // the width and height
+        this.featureSize = 8; //featureSize;
+        for (var i = 0; i < this.featureSize * this.featureSize; i++){
+            this.space.push(i);
+        }
+        this.space_2d = this.onedto2d(this.space);
+
+        // define the probability
+        this.p_space = [];
+        for (var i = 0; i < this.featureSize * this.featureSize; i++){
+            // this.p_space.push(0.3/15);
+            this.p_space.push(0.1/(this.featureSize * this.featureSize - 1));
+        }
+        this.p_space_2d = this.onedto2d(this.p_space);
+        // this.p_space_2d[1][2] = 0.7;
+        this.p_space_2d[this.systemOptimal[0]][this.systemOptimal[1]] = 0.9;
+
+        const p_space_2d = this.p_space_2d;
+
+        this.updates = p_space_2d;
+
+        // the number of user input
+        this.User_input = 5;
+
+        // starting point of user
+        this.user_position = [0, 0];
+    }
 }
+
 // // to run the system
 // while (Math.max(twodto1d(p_space_2d)) < 0.99) {
 

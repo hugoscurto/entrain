@@ -445,10 +445,9 @@ export default class SceneCo909 {
           this.setInstrumentBIGFeature(inst, features);
         }
 
-      this.resetNumInAIFeedback();
-      this.resetAIMeasure();
+        this.resetNumInAIFeedback();
+        this.resetAIMeasure();
       }
-
     }
 
     /// clear screen
