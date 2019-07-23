@@ -1,3 +1,7 @@
+# Entrain
+
+This project is based on the CoLoop project [https://github.com/ircam-cosima/coloop](https://github.com/ircam-cosima/coloop) originally designed by NoDesign and Ircam.
+
 # CoLoop
 
 _CoLoop_ is a participative/collaborative ghetto blaster designed by NoDesign.net and IRCAM in the framework of the CoSiMa project.
