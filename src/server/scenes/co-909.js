@@ -50,14 +50,16 @@ export default class SceneCo909 {
 
     this.BIG = new BIG(8, [2, 5], 5);
     this.numInAIFeedback = 0;
+
+    experience.sharedParams.addParamListener('reset-big', () => this.BIG.reset());
   }
 
   clientEnter(client) {
-    console.log(client.index);
     const experience = this.experience;
     const clientIndex = client.index;
 
     experience.receive(client, 'switchNote', this.onSwitchNote);
+    // reinit if barrel is reset while clients running
 
     this.isPlacing[clientIndex] = true;
     this.placer.start(client, () => {
@@ -147,7 +149,7 @@ export default class SceneCo909 {
   setNoteState(instrument, beat, state) {
     const sequence = this.instrumentSequences[instrument];
     sequence[beat] = state;
-
+    console.log(instrument, sequence);
   }
 
   setTempo(tempo) {
@@ -168,6 +170,7 @@ export default class SceneCo909 {
         let temp = sequence[i] - prevSequence[i];
         if (temp != 0) {numDifferentBeats += 1}
       }
+
       feature = numDifferentBeats;
       // // "normalization" over 4 different states (for BIG)
       // if (numDifferentBeats === 0) {feature = 0}
@@ -301,7 +304,7 @@ export default class SceneCo909 {
           } else {
             // console.log('no');
           }
-          
+
           this.setInstrumentPrevSequence(inst, sequence);
         }
 
@@ -359,7 +362,7 @@ export default class SceneCo909 {
     //     } else {
     //       // console.log('no');
     //     }
-        
+
     //     this.setInstrumentPrevSequence(inst, sequence);
     //   }
 
@@ -413,7 +416,7 @@ export default class SceneCo909 {
 
           let metaNumDifferentBeats = this.computeMetaFeatures(features, BIGFeatures, 0);
           let metaAutoCorr = this.computeMetaFeatures(features, BIGFeatures, 1);
-      
+
           let user_move = this.computeUserMove(metaNumDifferentBeats, metaAutoCorr);
 
           this.BIG.Update(user_move, BIGFeatures);
@@ -433,7 +436,7 @@ export default class SceneCo909 {
 
           let metaNumDifferentBeats = this.computeMetaFeatures(features, BIGFeatures, 0);
           let metaAutoCorr = this.computeMetaFeatures(features, BIGFeatures, 1);
-      
+
           let user_move = this.computeUserMove(metaNumDifferentBeats, metaAutoCorr);
 
           this.BIG.Update(user_move, BIGFeatures);
@@ -445,7 +448,7 @@ export default class SceneCo909 {
       this.resetNumInAIFeedback();
       this.resetAIMeasure();
       }
-      
+
     }
 
     /// clear screen

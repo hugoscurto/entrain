@@ -35,7 +35,11 @@ export default class BIG {
         // starting point of user
         this.user_position = [0, 0];
 
-        
+
+    }
+
+    reset() {
+        console.log('reset big');
     }
 
     // turn 1d array into 2d

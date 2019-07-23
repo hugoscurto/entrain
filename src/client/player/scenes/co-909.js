@@ -161,7 +161,7 @@ export default class SceneCo909 {
     this.buttonRadius = canvasMin / 15;
     this.circleRadius = canvasMin / 2 - this.buttonRadius - 10;
     this.renderer = new Renderer(this.sequence, this.circleRadius, this.buttonRadius, playerColors[clientIndex]);
-    
+
     this.audioOutput = experience.audioOutput;
     this.convolver = audioContext.createConvolver();
     this.noise = null;
@@ -220,7 +220,7 @@ export default class SceneCo909 {
     experience.receive('setIsActivated', this.onSetIsActivated);
     experience.receive('setFillColor', this.onSetFillColor);
     experience.receive('automaticSwitchNote', this.onAutomaticSwitchNote);
-    
+
   }
 
   enter() {
@@ -231,7 +231,7 @@ export default class SceneCo909 {
       const instrumentConfig = this.config.instruments[soundworks.client.index];
       const irConfig = this.config.ir[0];
       const noiseConfig = this.config.ir[3];
-      
+
       experience.audioBufferManager
         .loadFiles([instrumentConfig, irConfig, noiseConfig])
         .then(([instrument, ir, noise]) => {
@@ -310,7 +310,7 @@ export default class SceneCo909 {
   }
 
   onSetSoloMeasures(inst, measure) {
-    if (measure > this.soloMeasure + 4) {      
+    if (measure > this.soloMeasure + 4) {
       this.soloMeasure = measure;
     }
   }
@@ -318,15 +318,12 @@ export default class SceneCo909 {
   onSetIsActivated(inst, isActivated) {
     if (inst == this.clientIndex) {
       this.isActivated = isActivated;
-      console.log('this.isActivated =', isActivated)
-      // this.automaticSwitchNote()
+      console.log('this.isActivated =', isActivated);
     }
   }
 
   onAutomaticSwitchNote(arg) {
     const experience = this.experience;
-    // const sequence = this.sequence;
-    // console.log('this.sequence', this.sequence)
 
     let tempSequence = new Array(this.numSteps);
     let tempIndex = 0;
@@ -334,7 +331,7 @@ export default class SceneCo909 {
 
     for (let i = 0; i < this.numSteps; i++) {
       if (this.sequence[i] !=0) {
-        numBeats += 1
+        numBeats += 1;
         tempSequence[i] = 1;
       }
     }
@@ -344,7 +341,7 @@ export default class SceneCo909 {
     // Remove random beats
     if (numBeats > 4) {
       while (tempIndex < numSwitches) {
-        let index = Math.floor(Math.random() * this.numSteps) + 1 
+        let index = Math.floor(Math.random() * this.numSteps) + 1
         if (this.sequence[index] != 0) {
           // console.log(index);
           this.sequence[index] = 0;
@@ -353,55 +350,6 @@ export default class SceneCo909 {
         }
       }
     }
-      
-    // // Remove consecutive beats
-    // for (let i = 0; i < this.sequence.length; i++) {
-    //   if (tempIndex < 5) {
-    //     if (tempSequence[i+1] != 0 && tempSequence[i] != 0) {
-    //       this.sequence[i] = 0;
-    //       experience.send('switchNote', this.clientIndex, i, 0);
-    //       tempIndex += 1;
-    //     }
-    //   }
-    // }
-    
-    // if (numBeats >= 8) {
-      // // Remove random beats
-      // while (tempIndex < 5) {
-      //   let index = Math.floor(Math.random() * this.numSteps) + 1 
-      //   if (this.sequence[index] != 0) {
-      //     console.log(index);
-      //     this.sequence[index] = 0;
-      //     tempIndex += 1;
-      //   }
-      // }
-// 
-      // Remove consecutive beats
-      // for (let i = 0; i < this.sequence.length; i++) {
-      //   if (tempIndex < 5) {
-      //     if (tempSequence[i+1] != 0 && tempSequence[i] != 0) {
-      //       this.sequence[i] = 0;
-      //       experience.send('switchNote', this.clientIndex, i, 0);
-      //       tempIndex += 1;
-      //     }
-      //   }
-      // }
-    // } else {
-      // for (let i = 0; i < sequence.length; i++) {
-      //   if (tempIndex < 4) {
-      //     if (sequence[i] === 0 && sequence[i-1] === 0) {
-      //     // if (sequence[i] === 0 && sequence[i-1] != 0) {
-      //       console.log('i', i)
-      //       this.sequence[i] = 1;
-      //       experience.send('switchNote', this.clientIndex, i, 0);
-      //       tempIndex += 1;
-      //       console.log('tempIndex', tempIndex)
-      //     }
-      //   }
-      // }
-    // }
-// 
-    // console.log('this.sequence', this.sequence)
   }
 
   onTouchStart(id, x, y) {
@@ -421,6 +369,7 @@ export default class SceneCo909 {
       const beat = Math.floor((this.numSteps * (450 - angle) / 360) + 0.5) % this.numSteps;
       let state = (this.sequence[beat] + 1) % 3;
       this.sequence[beat] = state;
+
       experience.send('switchNote', this.clientIndex, beat, state);
     }
   }
@@ -430,167 +379,51 @@ export default class SceneCo909 {
     const highlightedMeasure = this.highlightedMeasure;
     const soloMeasure = this.soloMeasure;
 
-    // if (measure === soloMeasure && beat === 0) {
-    //   const noise = this.noise;
-    //   const gainNoise = audioContext.createGain();
-    //   gainNoise.gain.value = 0.25;
-    //   gainNoise.gain.setValueAtTime(0., audioScheduler.currentTime + 8.);
+    // @note - we don't want the player to make noise, its just a controller
+    // if (state > 0) {
+    //   const beatTime = audioScheduler.currentTime;
+    //   const layer = this.instrument.layers[state - 1];
 
-    //   const noiseSrc = audioContext.createBufferSource();
-    //   noiseSrc.connect(gainNoise);
-    //   gainNoise.connect(this.audioOutput);
+    //   const src = audioContext.createBufferSource();
+    //   const gain = audioContext.createGain();
+    //   gain.gain.value = decibelToLinear(layer.gain);
 
-    //   noiseSrc.buffer = noise.buffer;
-    //   // noiseSrc.start(audioScheduler.currentTime);
+    //   const playbackCoeff = this.instrument.playbackCoeff;
 
-    //   // gainNoise.gain.linearRampToValueAtTime(1.0, audioScheduler.currentTime + 8)
-    //   // gainNoise.gain.exponentialRampToValueAtTime(1.0, audioScheduler.currentTime + 8)
-    // }
+    //   if (this.isActivated) {
+    //     if (measure === highlightedMeasure) {
+    //       let endBeat = 1 * 16;
+    //       let startBeat = (measure - highlightedMeasure) * 16;
+    //       let fracBeat = (startBeat + beat) / endBeat;
 
-    if (state > 0) {
-      const beatTime = audioScheduler.currentTime;
-      const layer = this.instrument.layers[state - 1];
+    //       src.playbackRate.value = Math.pow(.5 * playbackCoeff, 2) + 1.;
 
-      const src = audioContext.createBufferSource();
-      const gain = audioContext.createGain();
-      gain.gain.value = decibelToLinear(layer.gain);
+    //       src.connect(gain);
+    //       gain.connect(this.delay);
+    //       this.delay.connect(this.audioOutput);
 
-      const playbackCoeff = this.instrument.playbackCoeff;
+    //     } else if (measure < soloMeasure + 4) {
+    //       let endBeat = 4 * 16;
+    //       let startBeat = (measure - soloMeasure) * 16;
+    //       let fracBeat = (startBeat + beat) / endBeat;
 
-      if (this.isActivated) {
-        // const delay1 = audioContext.createDelay();
-        // delay1.delayTime.value = 3./8;
+    //       src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
 
-        // const delay2 = audioContext.createDelay();
-        // delay2.delayTime.value = 5./8;
+    //       src.connect(gain);
+    //       gain.connect(this.delay);
+    //       this.delay.connect(this.audioOutput);
 
-        // const delay3 = audioContext.createDelay();
-        // delay3.delayTime.value = 7./8;
+    //     } else {
+    //       src.connect(gain);
+    //       gain.connect(this.audioOutput);
+    //     }
 
-        // const gain1 = audioContext.createGain();
-        // gain1.gain.value = decibelToLinear(layer.gain) - 0.3;
-
-        // const gain2 = audioContext.createGain();
-        // gain2.gain.value = decibelToLinear(layer.gain) - 0.3;
-
-        // const gain3 = audioContext.createGain();
-        // gain3.gain.value = decibelToLinear(layer.gain) - 0.3;
-
-        if (measure === highlightedMeasure) {
-          let endBeat = 1 * 16;
-          let startBeat = (measure - highlightedMeasure) * 16;
-          let fracBeat = (startBeat + beat) / endBeat;
-
-          // src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
-          src.playbackRate.value = Math.pow(.5 * playbackCoeff, 2) + 1.;
-
-          src.connect(gain);
-          gain.connect(this.delay);
-          this.delay.connect(this.audioOutput);
-
-          // gain.gain.value = decibelToLinear(50);
-          // src.connect(gain);
-          // gain.connect(this.convolver);
-          // this.convolver.connect(this.audioOutput);
-
-          // src.connect(gain1);
-          // gain1.connect(delay1);
-          // delay1.connect(this.convolver);
-          // this.convolver.connect(this.audioOutput);
-
-          // src.connect(gain2);
-          // gain2.connect(delay2);
-          // delay3.connect(this.convolver);
-          // this.convolver.connect(this.audioOutput);
-
-          // src.connect(gain3);
-          // gain3.connect(delay3);
-          // delay3.connect(this.convolver);
-          // this.convolver.connect(this.audioOutput);
-          
-        } else if (measure < soloMeasure + 4) {
-          let endBeat = 4 * 16;
-          let startBeat = (measure - soloMeasure) * 16;
-          let fracBeat = (startBeat + beat) / endBeat;
-
-          // console.log(Math.pow(fracBeat, 2) * decibelToLinear(layer.gain) + 0.3);
-          // gain.gain.setValueAtTime((Math.pow(fracBeat, 2) + 2.) * decibelToLinear(layer.gain), beatTime);
-
-          src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
-          // console.log(Math.pow(fracBeat * 5, 2) + 1.);
-
-          // src.connect(gain);
-          // gain.connect(this.convolver);
-          // gain.connect(delay);
-          // delay.connect(this.convolver);
-          // this.convolver.connect(this.audioOutput);
-
-          // let delay = new this.tuna.Delay({
-          //   feedback: 0.75,    //0 to 1+
-          //   delayTime: 1000.*3./8,    //1 to 10000 milliseconds
-          //   wetLevel: 0.25,    //0 to 1+
-          //   dryLevel: 1,       //0 to 1+
-          //   cutoff: 1000,      //cutoff frequency of the built in lowpass-filter. 20 to 22050
-          //   bypass: 0
-          // });
-
-          // var bitcrusher = new this.tuna.Bitcrusher({
-          //   bits: 4,          //1 to 16
-          //   normfreq: 0.1,    //0 to 1
-          //   bufferSize: 4096  //256 to 16384
-          // });
-
-          // var wahwah = new this.tuna.WahWah({
-          //   automode: true,                //true/false
-          //   baseFrequency: 0.5,            //0 to 1
-          //   excursionOctaves: 2,           //1 to 6
-          //   sweep: 0.2,                    //0 to 1
-          //   resonance: 10,                 //1 to 100
-          //   sensitivity: 0.5,              //-1 to 1
-          //   bypass: 0
-          // });
-
-          src.connect(gain);
-          gain.connect(this.delay);
-          this.delay.connect(this.audioOutput);
-
-          // src.connect(gain);
-          // gain.connect(this.audioOutput);
-
-          // src.connect(gain1);
-          // gain1.connect(delay1);
-          // delay1.connect(this.audioOutput);
-
-          // src.connect(gain2);
-          // gain2.connect(delay2);
-          // delay2.connect(this.audioOutput);
-
-          // src.connect(gain3);
-          // gain3.connect(delay3);
-          // delay3.connect(this.audioOutput);
-          
-        } else {
-          src.connect(gain);
-          gain.connect(this.audioOutput);
-        }
-        src.buffer = layer.buffer;
-        src.start(beatTime);
-      }
-    }
-
-    // if (this.isActivated === false) {
-    //   if (measure === soloMeasure + 4) {
-    //     this.isActivated = true;
-    //     console.log('this.isActivated = true;')
+    //     src.buffer = layer.buffer;
+    //     src.start(beatTime);
     //   }
     // }
-      // src.playbackRate.value = centToLinear((Math.random() * 2 - 1) * 100);
 
     this.renderer.setHighlight(beat);
-
-    // if (beat === 0) {
-    //     this.renderer.setAICanvas(0);
-    // }
 
     if (this.isActivated) {
       if (measure < soloMeasure + 4) {
@@ -602,16 +435,10 @@ export default class SceneCo909 {
       }
     } else if (this.isActivated === false) {
       if (measure === soloMeasure + 4) {
-        // console.log('false & 0')
         this.renderer.setAICanvas(0);
       } else {
-        // console.log('false & -1')
         this.renderer.setAICanvas(-2);
       }
     }
-
-    // if (beat === 0) {
-    //     this.renderer.setAICanvas(0);
-    // }
   }
 }
