@@ -47,7 +47,7 @@ window.addEventListener('load', () => {
     type: 'slider',
     size: 'large',
   });
-  
+
   controller.setGuiOptions('outputGain6', {
     type: 'slider',
     size: 'large',
@@ -69,6 +69,12 @@ window.addEventListener('load', () => {
   });
 
   controller.setGuiOptions('barrelDelay', {
+    type: 'slider',
+    size: 'large',
+  });
+
+
+  controller.setGuiOptions('ui-delay-players', {
     type: 'slider',
     size: 'large',
   });

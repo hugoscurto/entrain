@@ -53,6 +53,8 @@ sharedParams.addTrigger('reload', 'reload players');
 sharedParams.addTrigger('reload-barrel', 'reload barrel', ['barrel']);
 sharedParams.addTrigger('reset-big', 'reset BIG', ['barrel']);
 
+sharedParams.addNumber('ui-delay-players', 'UI delay players (ms)', 0, 1000, 1, 0, ['player']);
+
 const playerExperience = new PlayerExperience('player');
 const controllerExperience = new ControllerExperience('controller');
 const barrelExperience = new BarrelExperience('barrel', playerExperience);

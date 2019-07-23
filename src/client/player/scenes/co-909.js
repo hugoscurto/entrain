@@ -423,7 +423,7 @@ export default class SceneCo909 {
     //   }
     // }
 
-    this.renderer.setHighlight(beat);
+
 
     if (this.isActivated) {
       if (measure < soloMeasure + 4) {
@@ -440,5 +440,11 @@ export default class SceneCo909 {
         this.renderer.setAICanvas(-2);
       }
     }
+
+    const uiDelay = this.experience.sharedParams.params['ui-delay-players'].value;
+
+    setTimeout(() => {
+      this.renderer.setHighlight(beat);
+    }, uiDelay);
   }
 }
