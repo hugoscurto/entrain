@@ -17,6 +17,7 @@ export default {
         buffer: 'sounds/co-909/909-BD-high.wav',
         gain: 0,
       }, ],
+      playbackCoeff: 4,
     }, {
       name: 'snare drum',
       layers: [{
@@ -26,6 +27,7 @@ export default {
         buffer: 'sounds/co-909/909-SD-high.wav',
         gain: 0,
       }, ],
+      playbackCoeff: 1,
     }, {
       name: 'hi hat',
       layers: [{
@@ -35,6 +37,7 @@ export default {
         buffer: 'sounds/co-909/909-HH-open.wav',
         gain: 0,
       }, ],
+      playbackCoeff: .5,
     }, {
       name: 'mid tom',
       layers: [{
@@ -44,6 +47,7 @@ export default {
         buffer: 'sounds/co-909/909-MT-high.wav',
         gain: 0,
       }, ],
+      playbackCoeff: 3,
     }, {
       name: 'rim shot / hand clap',
       layers: [{
@@ -53,6 +57,7 @@ export default {
         buffer: 'sounds/co-909/909-PC-clap.wav',
         gain: -4,
       }, ],
+      playbackCoeff: 1,
     }, {
       name: 'high tom',
       layers: [{
@@ -62,6 +67,7 @@ export default {
         buffer: 'sounds/co-909/909-HT-high.wav',
         gain: 0,
       }, ],
+      playbackCoeff: 3,
     }, {
       name: 'low tom',
       layers: [{
@@ -71,6 +77,7 @@ export default {
         buffer: 'sounds/co-909/909-LT-high.wav',
         gain: 0,
       }, ],
+      playbackCoeff: 4,
     }, {
       name: 'cymbal',
       layers: [{
@@ -80,6 +87,24 @@ export default {
         buffer: 'sounds/co-909/909-CY-crash.wav',
         gain: 0,
       }, ],
+      playbackCoeff: .5,
+    }, ],
+    ir: [{
+      name: 'car park',
+      buffer: 'sounds/irs/ir_carpark.wav',
+      gain: 0,
+    }, {
+      name: 'air',
+      buffer: 'sounds/irs/air.wav',
+      gain: 0,
+    }, {
+      name: 'stable noise',
+      buffer: 'sounds/irs/stablenoise.wav',
+      gain: 0,
+    }, {
+      name: 'white noise filtered',
+      buffer: 'sounds/irs/whitenoise_filtered2.wav',
+      gain: 0,
     }, ],
   },
 

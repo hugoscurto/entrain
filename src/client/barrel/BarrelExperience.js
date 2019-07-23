@@ -16,12 +16,21 @@ const sceneCtors = {
   'wwry-r': SceneWwryR,
 };
 
+// const template = `
+//   <canvas class="background"></canvas>
+//   <div class="foreground">
+//     <div class="flex-middle">
+//       <p class="big">entrain</p>
+//     </div>
+//   </div>
+// `;
+
 const template = `
-  <canvas class="background"></canvas>
+  <canvas class="background flex-middle"></canvas>
   <div class="foreground">
-    <div class="flex-middle">
-      <p class="big">Barrel</p>
-    </div>
+    <div class="section-top flex-middle"></div>
+    <div class="section-center flex-middle"></div>
+    <div class="section-bottom flex-middle"></div>
   </div>
 `;
 
@@ -58,7 +67,10 @@ export default class BarrelExperience extends soundworks.Experience {
   start() {
     super.start();
 
-    this.view = new soundworks.View(template, {}, {}, { id: 'barrel' });
+    // this.view = new soundworks.View(template, {}, {}, { id: 'barrel' });
+    // this.show();
+
+    this.view = new soundworks.CanvasView(template, {}, {}, { id: 'barrel' });
     this.show();
 
     this.initScenes();

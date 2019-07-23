@@ -65,6 +65,8 @@ export default class PlayerExperience extends Experience {
     this.sharedParams.addParamListener('scene', this.onSceneChange);
     this.sharedParams.addParamListener('tempo', this.onTempoChange);
     this.sharedParams.addParamListener('clear', this.onClear);
+
+    this.enteredClients = new Array();
   }
 
   enterCurrentScene() {
@@ -85,14 +87,18 @@ export default class PlayerExperience extends Experience {
     super.enter(client);
     this.currentScene.clientEnter(client);
 
+    this.enteredClients.push(client.index);
+
     this.broadcast('barrel', null, 'connectClient', client.index);
     this.sharedParams.update('numPlayers', this.clients.length);
   }
 
   exit(client) {
     super.exit(client);
-
     this.currentScene.clientExit(client);
+
+    let index = this.enteredClients.indexOf(client.index);
+    if (index !== -1) {this.enteredClients.splice(index, 1)};
 
     this.broadcast('barrel', null, 'disconnectClient', client.index);
     this.sharedParams.update('numPlayers', this.clients.length);
@@ -110,6 +116,7 @@ export default class PlayerExperience extends Experience {
     }
 
     this.currentScene = this.scenes.off;
+    // this.currentScene = this.scenes['co-909'];
     this.enterCurrentScene();
   }
 

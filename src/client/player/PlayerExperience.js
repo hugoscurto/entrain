@@ -93,6 +93,7 @@ export default class PlayerExperience extends soundworks.Experience {
       const ctor = sceneCtors[scene];
       const config = sceneConfig[scene];
 
+      console.log(config);
       if (config)
         this.scenes[scene] = new ctor(this, config);
       else

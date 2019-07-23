@@ -27,6 +27,7 @@ class Renderer extends soundworks.Canvas2dRenderer {
   }
 
   setBlinkState(state) {
+    // console.log('renderer', state)
     this.blinkState = state;
   }
 }
@@ -91,4 +92,12 @@ export default class Placer {
   onMetroBeat(measure, beat) {
     this.renderer.setBlinkState(beat === 0);
   }
+
+  // setFillColor(isHighlighted) {
+  //   console.log('placer', isHighlighted)
+  //   const experience = this.experience;
+
+  //   this.renderer.setBlinkState(isHighlighted);
+  //   experience.view.render();
+  // }
 }
