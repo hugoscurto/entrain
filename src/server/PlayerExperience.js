@@ -1,7 +1,7 @@
 import { Experience } from 'soundworks/server';
 import sceneConfig from '../shared/scenes-config';
 import Scheduler from './Scheduler';
-import LedDisplay from './LedDisplay';
+// import LedDisplay from './LedDisplay';
 import SceneOff from './scenes/off';
 import SceneCo909 from './scenes/co-909';
 import SceneCollectiveLoops from './scenes/collective-loops';
@@ -17,8 +17,10 @@ const sceneCtors = {
 };
 
 export default class PlayerExperience extends Experience {
-  constructor(clientType) {
+  constructor(clientType, neoPixelDisplay) {
     super(clientType);
+
+    this.neoPixelDisplay = neoPixelDisplay;
 
     // client/server services
     this.sharedParams = this.require('shared-params');
@@ -46,19 +48,20 @@ export default class PlayerExperience extends Experience {
   start() {
     this.scheduler = new Scheduler(this.sync);
 
-    this.ledDisplay = new LedDisplay();
-    this.ledDisplay.connect(null, () => {
-      // null means automatic port search, otherwise put something like : /dev/tty.wchusbserial1420
+    // OLD big CoLoop
+    // this.ledDisplay = new LedDisplay();
+    // this.ledDisplay.connect(null, () => {
+    //   // null means automatic port search, otherwise put something like : /dev/tty.wchusbserial1420
 
-      this.ledDisplay.addListener('temperature', this.onTemperature);
-      this.ledDisplay.addListener('buttonIncremented', this.onButtonIncremented);
-      this.ledDisplay.addListener('buttonDecremented', this.onButtonDecremented);
+    //   this.ledDisplay.addListener('temperature', this.onTemperature);
+    //   this.ledDisplay.addListener('buttonIncremented', this.onButtonIncremented);
+    //   this.ledDisplay.addListener('buttonDecremented', this.onButtonDecremented);
 
-      // we need to wait that arduino start his processes and starts to listen
-      // this is not beautiful way to do it. Arduino has to send one byte when is ready... todo
-      setTimeout(() => { this.ledDisplay.requestTemperature(); }, 2000);
+    //   // we need to wait that arduino start his processes and starts to listen
+    //   // this is not beautiful way to do it. Arduino has to send one byte when is ready... todo
+    //   setTimeout(() => { this.ledDisplay.requestTemperature(); }, 2000);
 
-    });
+    // });
 
     this.initScenes();
 

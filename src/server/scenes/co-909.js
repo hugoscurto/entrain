@@ -2,6 +2,7 @@ import Metronome from '../Metronome';
 import BIG from '../BIG';
 import Placer from './Placer';
 import colorConfig from '../../shared/color-config';
+
 const playerColors = colorConfig.players;
 
 export default class SceneCo909 {
@@ -84,15 +85,15 @@ export default class SceneCo909 {
 
   enter() {
     const experience = this.experience;
-    experience.ledDisplay.addListener('buttonTurned', this.onButtonTurned);
-    experience.ledDisplay.screenOff();
+    // experience.ledDisplay.addListener('buttonTurned', this.onButtonTurned);
+    // experience.ledDisplay.screenOff();
 
     this.metronome.start();
   }
 
   exit() {
     const experience = this.experience;
-    experience.ledDisplay.removeListener('buttonTurned', this.onButtonTurned);
+    // experience.ledDisplay.removeListener('buttonTurned', this.onButtonTurned);
 
     this.metronome.stop();
   }
@@ -316,65 +317,6 @@ export default class SceneCo909 {
       this.updateAIMeasure();
     }
 
-    // /// compute descriptors (after each measure)
-    // if (beat === 15) { // if (beat === 0) {
-    //   console.log("---- measure ", measure);
-    //   const instrumentPrevSequences = this.instrumentPrevSequences;
-    //   const instrumentFeatures = this.instrumentFeatures;
-
-    //   if (this.AIMeasure >= 0){
-    //     experience.broadcast('barrel', null, 'setFillColor', Array());
-    //   }
-
-    //   let highlighedInstruments = new Array();
-
-    //   for (let inst in experience.enteredClients) {
-    //   // for (let inst = 0; inst < instrumentSequences.length; inst++) {
-    //     // experience.broadcast('player', null, 'setFillColor', inst, false);
-
-    //     if (this.AIMeasure >= 0) {
-    //       experience.broadcast('player', null, 'setIsActivated', inst, true);
-    //       experience.broadcast('barrel', null, 'setIsActivated', inst, true);
-    //     }
-
-    //     let sequence = instrumentSequences[inst];
-    //     let prevSequence = instrumentPrevSequences[inst];
-
-    //     let numDifferentBeats = this.computeFeature(sequence, prevSequence, 0);
-    //     let autoCorr = this.computeFeature(sequence, prevSequence, 1);
-
-    //     this.setInstrumentFeature(inst, 0, numDifferentBeats);
-    //     this.setInstrumentFeature(inst, 1, autoCorr);
-
-    //     console.log('instrumentFeatures', inst, instrumentFeatures[inst]);
-
-    //     // check if instrument in AI feedback
-    //     let inAIFeedback = this.BIG.isInAIFeedback(instrumentFeatures[inst]);
-    //     if (inAIFeedback) {
-    //       experience.broadcast('player', null, 'setHighlightedMeasure', inst, measure + 1);
-    //       experience.broadcast('barrel', null, 'setHighlightedMeasure', inst, measure + 1);
-    //       // experience.broadcast('player', null, 'setHighlightedMeasure', inst, measure);
-    //       this.updateNumInAIFeedback();
-    //       console.log(inst, ' in BIG feedback!');
-    //       experience.broadcast('player', null, 'setFillColor', inst, true);
-
-    //       highlighedInstruments.push(inst);
-    //     } else {
-    //       // console.log('no');
-    //     }
-
-    //     this.setInstrumentPrevSequence(inst, sequence);
-    //   }
-
-    //   if (this.AIMeasure >= 0){
-    //     console.log('highlighedInstruments', highlighedInstruments);
-    //     experience.broadcast('barrel', null, 'setFillColor', highlighedInstruments);
-    //   }
-
-    //   console.log(this.AIMeasure)
-    //   this.updateAIMeasure();
-    // }
-
     /// Update BIG (after this.AIUpdateMeasure measures)
     if (this.AIMeasure > this.AIUpdateMeasure) {
       console.log("------------------------------------ MODEL UPDATE");
@@ -408,6 +350,7 @@ export default class SceneCo909 {
         }
         // experience.broadcast('player', null, 'setFillColor', true);
         this.AIMeasure = -3;
+
         for (let inst in experience.enteredClients) {
         // for (let inst = 0; inst < instrumentFeatures.length; inst++) {
         // for (let inst = 0; inst < 1; inst++) {
@@ -450,6 +393,33 @@ export default class SceneCo909 {
       }
     }
 
+    const neoPixelDisplay = this.experience.neoPixelDisplay;
+    const ledDelay = this.experience.sharedParams.params['led-delay'].data.value;
+    // console.log('led delay', ledDelay);
+
+    setTimeout(() => {
+       // Mini-CoLoop
+      // example of normal beat (no highlight, no solo)
+      if (beat % 4 === 0) {
+        const protocol = 'NORMAL';
+        neoPixelDisplay.send(protocol);
+      }
+
+      // example of highlight protocol
+      // const protocol = 'HIGHLIGHT';
+      // const args = [0, 1, 4]; // list of highlighted clients that have a beat on
+      // neoPixelDisplay.send(protocol, ...args);
+
+      // example of solo protocol
+      // const protocol = 'SOLO';
+      // const clientIndex = 4;
+      // const isPlaying = 1; // 1 if current beat is on, 0 if off
+      // neoPixelDisplay.send(protocol, clientIndex, isPlaying);
+
+    }, ledDelay);
+
+
+    /* Big Coloop
     /// clear screen
     experience.ledDisplay.clearPixels();
 
@@ -540,6 +510,7 @@ export default class SceneCo909 {
     /// draw screen
     experience.ledDisplay.redraw();
     // console.log(str, beat);
+    */
   }
 
   onSwitchNote(instrument, beat, state) {

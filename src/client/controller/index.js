@@ -79,5 +79,10 @@ window.addEventListener('load', () => {
     size: 'large',
   });
 
+  controller.setGuiOptions('led-delay', {
+    type: 'slider',
+    size: 'large',
+  });
+
   soundworks.client.start();
 });

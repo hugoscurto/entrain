@@ -1,6 +1,7 @@
 import 'source-map-support/register'; // enable sourcemaps in node
 import path from 'path';
 import { server, ControllerExperience } from 'soundworks/server';
+import neoPixelDisplay from './neoPixelDisplay';
 import BarrelExperience from './BarrelExperience';
 import PlayerExperience from './PlayerExperience';
 
@@ -54,9 +55,35 @@ sharedParams.addTrigger('reload-barrel', 'reload barrel', ['barrel']);
 sharedParams.addTrigger('reset-big', 'reset BIG', ['barrel']);
 
 sharedParams.addNumber('ui-delay-players', 'UI delay players (ms)', 0, 1000, 1, 0, ['player']);
+sharedParams.addNumber('led-delay', 'LED delay (ms)', 0, 1000, 1, 0, ['barrel']);
 
-const playerExperience = new PlayerExperience('player');
-const controllerExperience = new ControllerExperience('controller');
-const barrelExperience = new BarrelExperience('barrel', playerExperience);
 
-server.start();
+const serialPath = '/dev/tty.wchusbserial1420'; // test mac
+// const serialPath = '/dev/ttyUSB0'; // RPi USB
+// const serialPath = '/dev/ttyS0';   // RPi Tx/Rx
+const baudRate = 9600;
+
+neoPixelDisplay.init(serialPath, baudRate).then(() => {
+  const playerExperience = new PlayerExperience('player', neoPixelDisplay);
+  const controllerExperience = new ControllerExperience('controller');
+  const barrelExperience = new BarrelExperience('barrel', playerExperience);
+
+  server.start();
+}).catch(err => {
+  console.log(err.message);
+  if (err === 'no arduino') {
+    console.log('>> not connected to arduino or wrong serial path - mocking ardiuno');
+    console.log('>> mocking neoPixelDisplay');
+    const neoPixelDisplayStub = {
+      send(...args) {
+        // console.log(...args);
+      },
+    };
+
+    const playerExperience = new PlayerExperience('player', neoPixelDisplayStub);
+    const controllerExperience = new ControllerExperience('controller');
+    const barrelExperience = new BarrelExperience('barrel', playerExperience);
+
+    server.start();
+  }
+});
