@@ -400,15 +400,26 @@ export default class SceneCo909 {
     setTimeout(() => {
        // Mini-CoLoop
       // example of normal beat (no highlight, no solo)
-      if (beat % 4 === 0) {
-        const protocol = 'NORMAL';
-        neoPixelDisplay.send(protocol);
-      }
+      // if (beat % 4 === 0) {
+      //   const protocol = 'NORMAL';
+      //   neoPixelDisplay.send(protocol);
+      // }
 
       // example of highlight protocol
-      // const protocol = 'HIGHLIGHT';
+      const protocol = 'HIGHLIGHT';
+      const players = [1, 3, 5];
+      const playingPlayers = [];
+
+      players.forEach((playerIndex) => {
+        const sequence = this.instrumentSequences[playerIndex];
+
+        if (sequence[beat] !== 0) {
+          playingPlayers.push(playerIndex);
+        }
+      });
+
       // const args = [0, 1, 4]; // list of highlighted clients that have a beat on
-      // neoPixelDisplay.send(protocol, ...args);
+      neoPixelDisplay.send(protocol, ...playingPlayers);
 
       // example of solo protocol
       // const protocol = 'SOLO';

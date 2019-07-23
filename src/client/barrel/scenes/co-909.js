@@ -2,7 +2,7 @@ import * as soundworks from 'soundworks/client';
 import { decibelToLinear } from 'soundworks/utils/math';
 import colorConfig from '../../../shared/color-config';
 import aColorConfig from '../../../shared/acolor-config';
-import tuna from 'tunajs';
+
 const audioContext = soundworks.audioContext;
 const audioScheduler = soundworks.audio.getScheduler();
 const playerColors = aColorConfig.players;
@@ -137,17 +137,21 @@ export default class SceneCo909 {
       // this.resetInstrumentSequence(i);
     }
 
-    this.tuna = new tuna(audioContext);
-    this.delay = new this.tuna.Delay({
-      feedback: 0.8,// 0.5,    //0 to 1+
-      delayTime: 1000.*3./8,    //1 to 10000 milliseconds
-      wetLevel: 0.25,    //0 to 1+
-      dryLevel: 1,       //0 to 1+
-      cutoff: 20000,      //cutoff frequency of the built in lowpass-filter. 20 to 22050
-      bypass: 0
-    });
-
+    // outputBusses are not created yet..., so the array is empty
     this.outputBusses = experience.outputBusses;
+
+    this.preDelay = audioContext.createGain();
+    this.preDelay.gain.value = 0.25; // wet
+
+    this.delay = audioContext.createDelay();
+    this.delay.delayTime.value = 1 * 3 / 8;
+
+    this.feedback = audioContext.createGain();
+    this.feedback.gain.value = 0.8;
+
+    this.preDelay.connect(this.delay);
+    this.delay.connect(this.feedback);
+    this.feedback.connect(this.delay);
 
     this.onSetHighlightedMeasure = this.onSetHighlightedMeasure.bind(this);
     this.onSetSoloMeasures = this.onSetSoloMeasures.bind(this);
@@ -194,6 +198,10 @@ export default class SceneCo909 {
     experience.view.template = template;
     ////experience.view.render();
     ////experience.view.addRenderer(this.renderer);
+    this.outputBusses.forEach(bus => {
+      console.log(bus);
+      this.delay.connect(bus);
+    });
   }
 
   enter() {
@@ -298,54 +306,47 @@ export default class SceneCo909 {
       const soloMeasure = this.instrumentSoloMeasures[i];
       const isActivated = this.instrumentIsActivated[i];
 
-      if (state > 0) {
+
+
+      if (state > 0 && isActivated) {
         const beatTime = audioScheduler.currentTime;
         const layer = instrument.layers[state - 1];
 
-        const src = audioContext.createBufferSource();
         const gain = audioContext.createGain();
+        gain.connect(this.outputBusses[i]);
         gain.gain.value = decibelToLinear(layer.gain);
+
+        const src = audioContext.createBufferSource();
+        src.connect(gain);
+        src.buffer = layer.buffer;
 
         const playbackCoeff = instrument.playbackCoeff;
 
-        if (isActivated) {
-          if (measure === highlightedMeasure) {
-            let endBeat = 1 * 16;
-            let startBeat = (measure - highlightedMeasure) * 16;
-            let fracBeat = (startBeat + beat) / endBeat;
+        if (measure === highlightedMeasure) {
+          let endBeat = 1 * 16;
+          let startBeat = (measure - highlightedMeasure) * 16;
+          let fracBeat = (startBeat + beat) / endBeat;
 
-            // src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
-            src.playbackRate.value = Math.pow(.5 * playbackCoeff, 2) + 1.;
+          // src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
+          src.playbackRate.value = Math.pow(.5 * playbackCoeff, 2) + 1.;
 
-            src.connect(gain);
-            gain.connect(this.delay);
-            this.delay.connect(this.outputBusses[i]);
+          gain.connect(this.preDelay);
 
-            ////this.renderer.setBeatCanvas(i, true);
+        } else if (measure < soloMeasure + 4) {
+          let endBeat = 4 * 16;
+          let startBeat = (measure - soloMeasure) * 16;
+          let fracBeat = (startBeat + beat) / endBeat;
 
-          } else if (measure < soloMeasure + 4) {
-            let endBeat = 4 * 16;
-            let startBeat = (measure - soloMeasure) * 16;
-            let fracBeat = (startBeat + beat) / endBeat;
+          src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
 
-            // console.log(Math.pow(fracBeat, 2) * decibelToLinear(layer.gain) + 0.3);
-            // gain.gain.setValueAtTime((Math.pow(fracBeat, 2) + 2.) * decibelToLinear(layer.gain), beatTime);
+          gain.connect(this.preDelay);
 
-            src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
-
-            src.connect(gain);
-            gain.connect(this.delay);
-            this.delay.connect(this.outputBusses[i]);
-
-            ////this.renderer.setBeatCanvas(i, true);
-
-          } else {
-            src.connect(gain);
-            gain.connect(this.outputBusses[i]);
-          }
-          src.buffer = layer.buffer;
-          src.start(beatTime);
+          ////this.renderer.setBeatCanvas(i, true);
         }
+
+        // gain.connect(this.preDelay);
+
+        src.start(beatTime);
       }
       // this.renderer.setHighlight(beat);
       // if (isActivated) {

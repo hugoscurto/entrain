@@ -23,8 +23,7 @@
     "debug": "^2.6.4",
     "serialport": "^7.1.5",
     "soundworks": "^2.2.0",
-    "source-map-support": "^0.4.0",
-    "tunajs": "^1.0.9"
+    "source-map-support": "^0.4.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
