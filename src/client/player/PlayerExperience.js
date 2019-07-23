@@ -31,7 +31,8 @@ export default class PlayerExperience extends soundworks.Experience {
     super();
 
     this.platform = this.require('platform', { features: ['web-audio'] });
-    this.motionInput = this.require('motion-input', { descriptors: ['accelerationIncludingGravity', 'rotationRate'] });
+    // @note - used only in `co-mix.js` and `wwry-r.js`
+    // this.motionInput = this.require('motion-input', { descriptors: ['accelerationIncludingGravity', 'rotationRate'] });
 
     this.scenes = {};
     this.currentScene = null;
@@ -94,6 +95,7 @@ export default class PlayerExperience extends soundworks.Experience {
       const config = sceneConfig[scene];
 
       console.log(config);
+
       if (config)
         this.scenes[scene] = new ctor(this, config);
       else

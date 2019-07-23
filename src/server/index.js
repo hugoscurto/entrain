@@ -50,8 +50,13 @@ sharedParams.addNumber('tempo', 'tempo', 60, 240, 5, 120, ['player', 'controller
 sharedParams.addTrigger('clear', 'clear players');
 sharedParams.addTrigger('reload', 'reload players');
 
-const controllerExperience = new ControllerExperience('controller');
-const barrelExperience = new BarrelExperience('barrel');
+sharedParams.addTrigger('reload-barrel', 'reload barrel', ['barrel']);
+sharedParams.addTrigger('reset-big', 'reset BIG', ['barrel']);
+
+sharedParams.addNumber('ui-delay-players', 'UI delay players (ms)', 0, 1000, 1, 0, ['player']);
+
 const playerExperience = new PlayerExperience('player');
+const controllerExperience = new ControllerExperience('controller');
+const barrelExperience = new BarrelExperience('barrel', playerExperience);
 
 server.start();

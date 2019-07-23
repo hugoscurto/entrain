@@ -87,7 +87,7 @@ class Renderer extends soundworks.Canvas2dRenderer {
 
   setBeatCanvas(inst, isBeat) {
     // Sets beats to flash light on.
-    
+
     this.beatCanvas = isBeat;
     this.instrumentBeat = inst;
   }
@@ -179,6 +179,13 @@ export default class SceneCo909 {
     experience.receive('setSoloMeasures', this.onSetSoloMeasures);
     experience.receive('setIsActivated', this.onSetIsActivated);
     experience.receive('setRendererMode', this.onSetRendererMode);
+    experience.receive('initSequences', instrumentSequences => {
+      instrumentSequences.forEach((sequence, index) => {
+        this.instrumentSequences[index] = sequence;
+      });
+    });
+
+    experience.send('initSequences');
 
     //
     this.$viewElem = experience.view.$el;
@@ -241,7 +248,7 @@ export default class SceneCo909 {
   onSetSoloMeasures(inst, measure) {
     const instrumentSoloMeasures = this.instrumentSoloMeasures;
 
-    if (measure > instrumentSoloMeasures[inst] + 4) {      
+    if (measure > instrumentSoloMeasures[inst] + 4) {
       instrumentSoloMeasures[inst] = measure;
     }
   }
@@ -271,7 +278,7 @@ export default class SceneCo909 {
     //   if (state > 0) {
     //     const layer = instrument.layers[state - 1];
 
-    //     const gain = audioContext.createGain(); 
+    //     const gain = audioContext.createGain();
     //     gain.connect(this.outputBusses[i]);
     //     gain.gain.value = decibelToLinear(layer.gain);
 
@@ -331,7 +338,7 @@ export default class SceneCo909 {
             this.delay.connect(this.outputBusses[i]);
 
             ////this.renderer.setBeatCanvas(i, true);
-            
+
           } else {
             src.connect(gain);
             gain.connect(this.outputBusses[i]);

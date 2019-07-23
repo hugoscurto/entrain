@@ -2,7 +2,8 @@ export default class BIG {
     constructor(featureSize, systemOptimal, userInput) {
 
         // starting point of system optimal
-        this.systemOptimal = systemOptimal;
+        this.defaultSystemOptimal = systemOptimal;
+        this.systemOptimal = this.defaultSystemOptimal;
         console.log(this.systemOptimal)
 
         // define the space
@@ -34,8 +35,6 @@ export default class BIG {
 
         // starting point of user
         this.user_position = [0, 0];
-
-        
     }
 
     // turn 1d array into 2d
@@ -347,7 +346,7 @@ export default class BIG {
         console.log("BIG RESET");
 
         // starting point of system optimal
-        this.systemOptimal = [2, 5]; // systemOptimal;
+        this.systemOptimal = this.defaultSystemOptimal; // systemOptimal;
         console.log(this.systemOptimal);
 
         // define the space
@@ -375,7 +374,7 @@ export default class BIG {
         this.updates = p_space_2d;
 
         // the number of user input
-        this.User_input = 5; userInput;
+        this.User_input = 5;
 
         // starting point of user
         this.user_position = [0, 0];

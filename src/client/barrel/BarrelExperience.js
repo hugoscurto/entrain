@@ -152,6 +152,8 @@ export default class BarrelExperience extends soundworks.Experience {
     this.sharedParams.addParamListener('wooferGain', (value) => this.setWooferGain(value));
     this.sharedParams.addParamListener('wooferCutoff', (value) => this.setWooferCutoff(value));
     this.sharedParams.addParamListener('barrelDelay', (value) => this.setDelay(value));
+
+    this.sharedParams.addParamListener('reload-barrel', () => window.location.reload(true));
   }
 
   initScenes() {
