@@ -424,26 +424,25 @@ export default class SceneCo909 {
     // }
 
 
-
-    if (this.isActivated) {
-      if (measure < soloMeasure + 4) {
-        this.renderer.setAICanvas(2);
-      } else if (measure === highlightedMeasure) {
-        this.renderer.setAICanvas(1);
-      } else if (beat === 1) {
-        this.renderer.setAICanvas(0);
-      }
-    } else if (this.isActivated === false) {
-      if (measure === soloMeasure + 4) {
-        this.renderer.setAICanvas(0);
-      } else {
-        this.renderer.setAICanvas(-2);
-      }
-    }
-
     const uiDelay = this.experience.sharedParams.params['ui-delay-players'].value;
 
     setTimeout(() => {
+      if (this.isActivated) {
+        if (measure < soloMeasure + 4) {
+          this.renderer.setAICanvas(2);
+        } else if (measure === highlightedMeasure) {
+          this.renderer.setAICanvas(1);
+        } else if (beat === 1) {
+          this.renderer.setAICanvas(0);
+        }
+      } else if (this.isActivated === false) {
+        if (measure === soloMeasure + 4) {
+          this.renderer.setAICanvas(0);
+        } else {
+          this.renderer.setAICanvas(-2);
+        }
+      }
+
       this.renderer.setHighlight(beat);
     }, uiDelay);
   }
