@@ -402,11 +402,17 @@ export default class SceneCo909 {
 
     // compute specific indexes for neoPixelDisplay
     if (protocol == 'HIGHLIGHT') {
-      const args = []; // list of highlighted clients that have a beat on
-      for (hInst in highlighedInstruments) {
-        let sequence = instrumentSequences[hInst];
-        if (sequence[beat] != 0) {
-          args.push(hInst);
+      const args = [];
+      for (let inst in experience.enteredClients) {
+        if (inst in highlighedInstruments) {
+          let sequence = instrumentSequences[inst];
+          if (sequence[beat] != 0) {
+            args.push(2);
+          } else {
+            args.push(1);
+          }
+        } else {
+          args.push(0);
         }
       }
     } else if (protocol == 'SOLO') {
