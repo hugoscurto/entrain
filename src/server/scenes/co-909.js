@@ -253,6 +253,7 @@ export default class SceneCo909 {
     const instrumentSequences = this.instrumentSequences;
     let displaySelector = Math.round((32.0 / 16.0) * beat);
     const numBeats = this.config.numSteps;
+    const protocol = 'NORMAL'
 
     // if (this.AIMeasure === 0) {
     //   for (let inst = 0; inst < instrumentSequences.length; inst++) {
@@ -294,6 +295,7 @@ export default class SceneCo909 {
           // check if instrument in AI feedback
           let inAIFeedback = this.BIG.isInAIFeedback(instrumentFeatures[inst]);
           if (inAIFeedback) {
+            protocol = 'HIGHLIGHT'
             experience.broadcast('player', null, 'setHighlightedMeasure', inst, measure + 1);
             experience.broadcast('barrel', null, 'setHighlightedMeasure', inst, measure + 1);
             // experience.broadcast('player', null, 'setHighlightedMeasure', inst, measure);
@@ -325,6 +327,7 @@ export default class SceneCo909 {
       const instrumentMetaFeatures = this.instrumentMetaFeatures;
 
       if (this.numInAIFeedback === 0) {
+        protocol = 'SOLO'
         let highlighedInst = this.BIG.computeClosestInstrument(instrumentFeatures, experience.enteredClients);
         console.log("highlighedInst: ", highlighedInst)
         experience.broadcast('player', null, 'automaticSwitchNote', -1);
@@ -397,13 +400,42 @@ export default class SceneCo909 {
     const ledDelay = this.experience.sharedParams.params['led-delay'].data.value;
     // console.log('led delay', ledDelay);
 
-    setTimeout(() => {
-       // Mini-CoLoop
-      // example of normal beat (no highlight, no solo)
-      if (beat % 4 === 0) {
-        const protocol = 'NORMAL';
-        neoPixelDisplay.send(protocol);
+    // compute specific indexes for neoPixelDisplay
+    if (protocol == 'HIGHLIGHT') {
+      const args = []; // list of highlighted clients that have a beat on
+      for (hInst in highlighedInstruments) {
+        let sequence = instrumentSequences[hInst];
+        if (sequence[beat] != 0) {
+          args.push(hInst);
+        }
       }
+    } else if (protocol == 'SOLO') {
+      const isPlaying = 0; // 1 if current beat is on, 0 if off
+      let sequence = instrumentSequences[highlighedInst];
+      if (sequence[beat] != 0) {
+        isPlaying = 1;
+      } else {
+        isPlaying = 0;
+      }
+    }
+
+    setTimeout(() => {
+      if (protocol == 'NORMAL') {
+        if (beat % 4 === 0) {
+          neoPixelDisplay.send(protocol);
+        }
+      } else if (protocol == 'HIGHLIGHT') {
+        neoPixelDisplay.send(protocol, ...args);
+      } else if (protocol == 'SOLO') {
+        neoPixelDisplay.send(protocol, clientIndex, isPlaying);
+      }
+      
+      // Mini-CoLoop
+      // example of normal beat (no highlight, no solo)
+      // if (beat % 4 === 0) {
+      //  const protocol = 'NORMAL';
+      //  neoPixelDisplay.send(protocol);
+      // }
 
       // example of highlight protocol
       // const protocol = 'HIGHLIGHT';
