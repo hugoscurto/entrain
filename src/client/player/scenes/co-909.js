@@ -3,7 +3,7 @@ import { decibelToLinear, centToLinear } from 'soundworks/utils/math';
 import Placer from './Placer';
 import colorConfig from '../../../shared/color-config';
 import aColorConfig from '../../../shared/acolor-config';
-import tuna from 'tunajs';
+// import tuna from 'tunajs';
 const client = soundworks.client;
 const audioContext = soundworks.audioContext;
 const audioScheduler = soundworks.audio.getScheduler();
@@ -166,15 +166,15 @@ export default class SceneCo909 {
     this.convolver = audioContext.createConvolver();
     this.noise = null;
 
-    this.tuna = new tuna(audioContext);
-    this.delay = new this.tuna.Delay({
-            feedback: 0.8,// 0.5,    //0 to 1+
-            delayTime: 1000.*3./8,    //1 to 10000 milliseconds
-            wetLevel: 0.25,    //0 to 1+
-            dryLevel: 1,       //0 to 1+
-            cutoff: 20000,      //cutoff frequency of the built in lowpass-filter. 20 to 22050
-            bypass: 0
-          });
+    // this.tuna = new tuna(audioContext);
+    // this.delay = new this.tuna.Delay({
+    //         feedback: 0.8,// 0.5,    //0 to 1+
+    //         delayTime: 1000.*3./8,    //1 to 10000 milliseconds
+    //         wetLevel: 0.25,    //0 to 1+
+    //         dryLevel: 1,       //0 to 1+
+    //         cutoff: 20000,      //cutoff frequency of the built in lowpass-filter. 20 to 22050
+    //         bypass: 0
+    //       });
 
     this.highlightedMeasure = -1;
     this.soloMeasure = -1;
