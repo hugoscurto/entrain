@@ -140,8 +140,11 @@ export default class SceneCo909 {
     // outputBusses are not created yet..., so the array is empty
     this.outputBusses = experience.outputBusses;
 
-    this.preDelay = audioContext.createGain();
-    this.preDelay.gain.value = 0.25; // wet
+    this.preDelayHighlight = audioContext.createGain();
+    this.preDelayHighlight.gain.value = 0.12; // wet
+
+    this.preDelaySolo = audioContext.createGain();
+    this.preDelaySolo.gain.value = 0.25; // wet
 
     this.delay = audioContext.createDelay();
     this.delay.delayTime.value = 1 * 3 / 8;
@@ -149,7 +152,8 @@ export default class SceneCo909 {
     this.feedback = audioContext.createGain();
     this.feedback.gain.value = 0.8;
 
-    this.preDelay.connect(this.delay);
+    this.preDelayHighlight.connect(this.delay);
+    this.preDelaySolo.connect(this.delay);
     this.delay.connect(this.feedback);
     this.feedback.connect(this.delay);
 
@@ -201,6 +205,16 @@ export default class SceneCo909 {
     this.outputBusses.forEach(bus => {
       console.log(bus);
       this.delay.connect(bus);
+    });
+
+    experience.sharedParams.addParamListener('pre-delay-highlight', value => {
+      console.log('pre-delay-highlight', value);
+      this.preDelayHighlight.gain.value = value;
+    });
+
+    experience.sharedParams.addParamListener('pre-delay-solo', value => {
+      console.log('pre-delay-solo', value);
+      this.preDelaySolo.gain.value = value;
     });
   }
 
@@ -330,7 +344,7 @@ export default class SceneCo909 {
           // src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
           src.playbackRate.value = Math.pow(.5 * playbackCoeff, 2) + 1.;
 
-          gain.connect(this.preDelay);
+          gain.connect(this.preDelayHighlight);
 
         } else if (measure < soloMeasure + 4) {
           let endBeat = 4 * 16;
@@ -339,7 +353,7 @@ export default class SceneCo909 {
 
           src.playbackRate.value = Math.pow(fracBeat * playbackCoeff, 2) + 1.;
 
-          gain.connect(this.preDelay);
+          gain.connect(this.preDelaySolo);
 
           ////this.renderer.setBeatCanvas(i, true);
         }

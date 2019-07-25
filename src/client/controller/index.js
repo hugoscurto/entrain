@@ -84,5 +84,15 @@ window.addEventListener('load', () => {
     size: 'large',
   });
 
+  controller.setGuiOptions('pre-delay-highlight', {
+    type: 'slider',
+    size: 'large',
+  });
+
+  controller.setGuiOptions('pre-delay-solo', {
+    type: 'slider',
+    size: 'large',
+  });
+
   soundworks.client.start();
 });

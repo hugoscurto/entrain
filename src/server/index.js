@@ -58,6 +58,9 @@ sharedParams.addNumber('ui-delay-players', 'UI delay players (ms)', 0, 1000, 1, 
 sharedParams.addNumber('led-delay', 'LED delay (ms)', 0, 1000, 1, 0, ['barrel']);
 sharedParams.addNumber('led-brightness', 'LED brightness', 0, 9, 1, 9, ['barrel']);
 
+sharedParams.addNumber('pre-delay-highlight', 'pre-delay-highlight', 0, 1, 0.01, 0.12, ['barrel']);
+sharedParams.addNumber('pre-delay-solo', 'pre-delay-solo', 0, 1, 0.01, 0.25, ['barrel']);
+
 
 const serialPath = '/dev/tty.wchusbserial1420'; // test mac
 // const serialPath = '/dev/ttyUSB0'; // RPi USB
