@@ -56,6 +56,7 @@ sharedParams.addTrigger('reset-big', 'reset BIG', ['barrel']);
 
 sharedParams.addNumber('ui-delay-players', 'UI delay players (ms)', 0, 1000, 1, 0, ['player']);
 sharedParams.addNumber('led-delay', 'LED delay (ms)', 0, 1000, 1, 0, ['barrel']);
+sharedParams.addNumber('led-brightness', 'LED brightness', 0, 9, 1, 9, ['barrel']);
 
 
 const serialPath = '/dev/tty.wchusbserial1420'; // test mac
@@ -68,6 +69,11 @@ neoPixelDisplay.init(serialPath, baudRate).then(() => {
   const controllerExperience = new ControllerExperience('controller');
   const barrelExperience = new BarrelExperience('barrel', playerExperience);
 
+  sharedParams.addParamListener('led-brightness', value => {
+    neoPixelDisplay.send('BRIGHTNESS', value);
+  });
+
+  console.log('server, start');
   server.start();
 }).catch(err => {
   console.log(err.message);

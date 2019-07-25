@@ -5,24 +5,29 @@
 
 #define LED_PIN   6
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT 7
+#define LED_COUNT 56
+
+const int NUM_LIGHTS = 8;
+const int NUM_LEDS_PER_LIGHT = 7;
+const int NUM_CLIENTS = 8;
 
 // protocol can be:
-// 0 => normal
-// 1 => hightlight
-// 2 => solo
+//    0 => normal
+//    1 => hightlight
+//    2 => solo
 int protocol = 0;
 // for highlight protocol
-const int NUM_CLIENTS = 8;
-int highlightNumber = 0;
 int highlightList[NUM_CLIENTS];
 
 // for solo protocol
 int soloIndex = 0;
 int soloHasBeat = 0; // 1 if playing
 
-int TRIGGER_DURATION = 100; // ms
+int TRIGGER_DURATION = 20; // ms
 boolean newData = false;
+
+// luminosity
+int brightness = 255;
 
 Adafruit_NeoPixel pixels(LED_COUNT, LED_PIN, NEO_RGBW + NEO_KHZ800);
 
@@ -45,7 +50,7 @@ void setup() {
   // pinMode(LED, OUTPUT);
   pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
   pixels.show();            // Turn OFF all pixels ASAP
-  pixels.setBrightness(50);
+  pixels.setBrightness(brightness);
 }
 
 void loop() {
@@ -53,16 +58,20 @@ void loop() {
 
   if (newData) {
     switch (protocol) {
-      case 0:
+      case 0: // normal
         triggerNormalBeat();
         break;
-      case 1:
+      case 1: // highlight
         triggerHighlightBeat();
         break;
-      case 2:
+      case 2: // solo
         triggerSoloBeat();
         break;
-    }
+      case 3:
+        pixels.setBrightness(brightness);
+        pixels.show();
+        break;  
+    } 
 
     newData = false;
   }
@@ -70,114 +79,120 @@ void loop() {
   delay(20);
 }
 
+int receivedIndex = 0;          // current index of data buffer
+
 void receiveData() {
   static char endMarker = '\n'; // message separator
   char receivedChar;     // read char from serial port
   int receivedInt;
-  int index = 0;          // current index of data buffer
 
   // read while we have data available and we are still receiving the same message.
   while(Serial.available() > 0) {
     receivedChar = Serial.read();
 
     if (receivedChar == endMarker) {
+      // Serial.println("endMessage");
       // data[index] = '\0'; // end current message
+      receivedIndex = 0;
       newData = true;
       return;
     }
 
     receivedInt = receivedChar - '0';
 
-    if (index == 0) {
+    if (receivedIndex == 0) {
       protocol = receivedInt;
     }
 
     switch (protocol) {
       case 1: // highlight
-        if (index == 0) {
-          highlightNumber = 0;
-        } else {
-          highlightList[highlightNumber] = receivedInt;
-          highlightNumber += 1;
+        if (receivedIndex > 0) {
+          // 0 is off
+          // 1 is on with client color at client index
+          // 2 is same as one with flash
+          highlightList[receivedIndex - 1] = receivedInt;
         }
         break;
-      case 2:
-        if (index == 1) {
+      case 2: // solo
+        if (receivedIndex == 1) {
           soloIndex = receivedInt;
-        } else if (index == 2) {
+        } else if (receivedIndex == 2) {
           soloHasBeat = receivedInt;
         }
+        break;
+      case 3: // brightness
+        brightness = floor((receivedInt / 9.0) * 255.0);
+        Serial.print("update brightness: ");
+        Serial.println(brightness);
         break;
     }
 
 
-    index++;
-    delay(1);
+    receivedIndex++;
+    delay(4);
   }
 }
 
 void triggerNormalBeat() {
-  Serial.println("triggerNormalBeat");
-  pixels.clear();
-
-  // int color = floor(random(0.0, 1000.0) / 1000.0 * 256.0);
-  // Serial.println(color);
+  // Serial.println("BEAT");
+  uint32_t white = pixels.Color(0, 0, 0, 1);
 
   for (int i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, pixels.Color(255, 255, 255));
-  }
+    pixels.setPixelColor(i, white);
+  } 
 
   pixels.show();
-  delay(TRIGGER_DURATION);
-  Serial.println("triggerNormalBeat::clear");
-
-  for (int i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0, 0));
-  }
-
-  pixels.show();
-  pixels.clear();
 }
 
 void triggerHighlightBeat() {
-  Serial.println("triggerHighlightBeat");
-  pixels.clear();
-
-  uint32_t white = pixels.Color(0, 0, 0, 255);
-  // paint everything in white
-  for (int i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, white);
-  }
-
+  // Serial.println("HIGHLIGH");
+  // for (int i = 0; i < NUM_CLIENTS; i++) {
+  //   Serial.print(highlightList[i]);
+  //   Serial.print(", ");
+  // }
+  // Serial.println("");
   // override with highlighted clients
-  for (int i = 0; i < highlightNumber; i++) {
-    int clientIndex = highlightList[i];
-    pixels.setPixelColor(clientIndex, colors[clientIndex]);
+  for (int i = 0; i < NUM_CLIENTS; i++) {
+    int ledStartIndex = i * 7;
+    int state = highlightList[i];
+    uint32_t color;
+    if (state == 0) {
+      color = pixels.Color(0, 0, 0, 0); // nothing
+    } else if (state == 1) {
+      color = colors[i];
+    } else if (state == 2) {
+      color = pixels.Color(0, 0, 0, 255);
+    }
+
+    for (int j = ledStartIndex; j < ledStartIndex + 7; j++) {
+      pixels.setPixelColor(j, color);
+    }
   }
 
   pixels.show();
-  delay(TRIGGER_DURATION);
 
-  for (int i = 0; i < pixels.numPixels(); i++) {
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0, 0));
+  for (int i = 0; i < NUM_CLIENTS; i++) {
+    int ledStartIndex = i * 7;
+    int state = highlightList[i];
+
+    if (state == 2) {
+      delay(TRIGGER_DURATION);
+      // back to client color after flash
+      uint32_t color = colors[i];
+      for (int j = ledStartIndex; j < ledStartIndex + 7; j++) {
+        pixels.setPixelColor(j, color);
+      }
+    }
   }
 
   pixels.show();
-  // pixels.clear();
 }
 
 
 void triggerSoloBeat() {
-  // soloIndex
-  // soloHasBeat
-  Serial.println("triggerSoloBeat");
-  Serial.println(soloIndex);
-  pixels.clear();
-
+  // Serial.println("SOLO");
   uint32_t soloColor = colors[soloIndex];
   uint32_t white = pixels.Color(0, 0, 0, 255);
-
-  Serial.println(soloColor);
 
   if (soloHasBeat == 0) {
     for (int i = 0; i < pixels.numPixels(); i++) {
@@ -189,6 +204,7 @@ void triggerSoloBeat() {
     for (int i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, white);
     }
+
     pixels.show();
 
     delay(TRIGGER_DURATION);
@@ -196,6 +212,7 @@ void triggerSoloBeat() {
     for (int i = 0; i < pixels.numPixels(); i++) {
       pixels.setPixelColor(i, soloColor);
     }
+    
     pixels.show();
   }
 }

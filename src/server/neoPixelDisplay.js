@@ -5,6 +5,7 @@ const protocols = {
   NORMAL: 0,
   HIGHLIGHT: 1,
   SOLO: 2,
+  BRIGHTNESS: 3,
 };
 
 // players: ["FF0000", "00FF55", "023EFF", "FFFF00", "D802FF", "00FFF5", "FF0279", "FF9102"],
@@ -40,7 +41,7 @@ const neoPixelDisplay = {
         return console.log('Error on write: ', err.message);
       }
 
-      console.log('message written');
+      // console.log('message written');
     });
   },
 }
